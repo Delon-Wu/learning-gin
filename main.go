@@ -218,6 +218,8 @@ func main() {
 			c.JSON(http.StatusOK, gin.H{"data": booking, "message": "It's valid"})
 		}
 	})
+
+	//router.RunTLS(":8080", "./testdata/server.pem", "./testdata/server.key") // 后俩个为证书
 	router.Run(":8080")
 }
 

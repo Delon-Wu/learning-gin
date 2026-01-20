@@ -24,7 +24,7 @@ type Order struct {
 	UserID    string      `json:"user_id"`
 	ProductID string      `json:"product_id"`
 	Quantity  int         `json:"quantity"`
-	Amount    int         `json:"amount"`
+	Amount    float64     `json:"amount"`
 	Status    OrderStatus `json:"status"`
 	CreatedAt time.Time   `json:"created_at"`
 }

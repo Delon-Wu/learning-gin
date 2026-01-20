@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"learning-gin/distributed-transation-mvp/internal/kafka"
 	"learning-gin/distributed-transation-mvp/internal/models"
 	"log"
@@ -19,7 +20,7 @@ var (
 )
 
 func main() {
-	producer := kafka.NewProducer([]string{"localhost:9092"}, "saga-events")
+	producer = kafka.NewProducer([]string{"localhost:9092"}, "saga-events")
 	defer producer.Close()
 
 	consumer := kafka.NewConsumer([]string{"localhost:9092"}, "saga-events", "inventory-service")
@@ -59,7 +60,7 @@ func handleOrderCreated(event models.SagaEvent) {
 	} else {
 		log.Printf("Infsufficient stock for %s. Requested: %d, Available: %d", productID, quantity, currentStock)
 	}
-
+	fmt.Printf("event %v\n", event)
 	responseEvent := models.SagaEvent{
 		EventID:   uuid.New().String(),
 		EventType: map[bool]string{true: "INVENTORY_RESERVED", false: "INVENTORY_FAILED"}[success],

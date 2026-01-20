@@ -23,9 +23,9 @@ func NewConsumer(brokers []string, topic string, groupID string) *Consumer {
 	}
 }
 
-func (p *Consumer) Consume(ctx context.Context, handler func([]byte) error) error {
+func (c *Consumer) Consume(ctx context.Context, handler func([]byte) error) error {
 	for {
-		msg, err := p.reader.ReadMessage(ctx)
+		msg, err := c.reader.ReadMessage(ctx)
 		if err != nil {
 			log.Printf("Error reading message: %v", err)
 			continue
@@ -37,6 +37,6 @@ func (p *Consumer) Consume(ctx context.Context, handler func([]byte) error) erro
 	}
 }
 
-func (p *Consumer) Close() error {
-	return p.reader.Close()
+func (c *Consumer) Close() error {
+	return c.reader.Close()
 }

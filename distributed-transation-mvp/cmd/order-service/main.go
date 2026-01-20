@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -19,7 +20,7 @@ var (
 )
 
 func main() {
-	producer = kafka.NewProducer([]string{"localhost:9092"}, "saga-event")
+	producer = kafka.NewProducer([]string{"localhost:9092"}, "saga-events")
 	defer producer.Close()
 
 	// 启动消费者监听补偿事件
@@ -51,10 +52,10 @@ func getOrder(c *gin.Context) {
 
 func createOrder(c *gin.Context) {
 	var req struct {
-		UserID    string `json:"user_id"`
-		ProductID string `json:"product_id"`
-		Quantity  int    `json:"quantity"`
-		Amount    int    `json:"amount"`
+		UserID    string  `json:"user_id"`
+		ProductID string  `json:"product_id"`
+		Quantity  int     `json:"quantity"`
+		Amount    float64 `json:"amount"`
 	}
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -62,10 +63,13 @@ func createOrder(c *gin.Context) {
 	}
 
 	order := &models.Order{
+		ID:        uuid.New().String(),
 		UserID:    req.UserID,
 		ProductID: req.ProductID,
 		Quantity:  req.Quantity,
 		Amount:    req.Amount,
+		Status:    models.OrderPending,
+		CreatedAt: time.Now(),
 	}
 
 	orderMu.Lock()
@@ -83,6 +87,7 @@ func createOrder(c *gin.Context) {
 			"quantity":   order.Quantity,
 			"amount":     order.Amount,
 		},
+		Timestamp: time.Now(),
 	}
 
 	if err := producer.SendEvent(context.Background(), order.ID, event); err != nil {

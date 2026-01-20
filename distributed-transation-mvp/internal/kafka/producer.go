@@ -30,13 +30,13 @@ func (p *Producer) SendEvent(ctx context.Context, key string, event interface{})
 		return err
 	}
 
-	msg := &kafka.Message{
+	msg := kafka.Message{
 		Key:   []byte(key),
 		Value: data,
 		Time:  time.Now(),
 	}
 
-	return p.writer.WriteMessages(ctx, *msg)
+	return p.writer.WriteMessages(ctx, msg)
 }
 
 func (p *Producer) Close() error {
